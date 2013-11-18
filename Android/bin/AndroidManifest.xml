@@ -8,6 +8,10 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -22,6 +26,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        <activity
+            android:name="com.lucyhutcheson.godisciple.AddActivity"
+            android:parentActivityName="com.lucyhutcheson.godisciple.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lucyhutcheson.godisciple.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.lucyhutcheson.godisciple.EditActivity"
+            android:parentActivityName="com.lucyhutcheson.godisciple.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lucyhutcheson.godisciple.MainActivity" />
+        </activity>
+        </application>
 
 </manifest>
