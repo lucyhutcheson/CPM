@@ -90,11 +90,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    values.put(KEY_PHONE, discipleObject.getPhone()); 
 	    values.put(KEY_AGE, discipleObject.getAge()); 
 	 
-	    // Inserting Row
+	    // INSERT QUERY
 	    db.insert(TABLE_NAME, null, values);
-
-    	Log.i(TAG, "addDisciple COMPLETED");
-	    db.close(); // Closing database connection
+	    db.close(); 
 	}
 	
 	// RETURNS A SORTED LIST BASED ON FILTER SELECTED BY USER
@@ -114,6 +112,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			} while (cursor.moveToNext());
 		}
 
+		// RETURN MY LIST
 		return discipleResult;
 	}
 	
@@ -154,7 +153,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	
 	// UPDATES DISCIPLE ENTRY BASED ON PASSED IN ID AND OBJECT DATA
-	public boolean updateDisciple(Disciple disciple) {
+	public int updateDisciple(Disciple disciple) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues newData = new ContentValues();
@@ -164,8 +163,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		newData.put(KEY_PHONE, disciple.getPhone());
 		newData.put(KEY_AGE, disciple.getAge());
 		
+		Log.i(TAG, newData.toString());
+		Log.i(TAG, String.valueOf(disciple.getID()));
 		
-		return true;
+		return db.update(TABLE_NAME, newData, KEY_ID + " = ?", new String[] { String.valueOf(disciple.getID()) });
+		
 	}
 	
 }

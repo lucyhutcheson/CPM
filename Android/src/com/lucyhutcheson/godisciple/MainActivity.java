@@ -64,9 +64,9 @@ public class MainActivity extends Activity {
 
 	static final String TAG = "MAINACTIVITY";
 	static final String[] _from = new String[] { "first", "last", "phone",
-			"age", "email", "id" };
+			"age", "email" };
 	static final int[] _to = new int[] { R.id.firstHolder, R.id.lastHolder,
-			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder, R.id.idHolder };
+			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,8 +186,7 @@ public class MainActivity extends Activity {
 
 	// EDIT / DELETE CONTEXT MENU
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Choose Action");
 		MenuInflater inflater = getMenuInflater();

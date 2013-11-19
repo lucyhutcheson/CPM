@@ -90,7 +90,7 @@ public class EditActivity extends Activity {
 			EditActivity.this.finish();
 			return true;
 		case R.id.action_save:
-			//onSubmit();
+			onSubmit();
 			return true;
 		case R.id.action_cancel:
 			EditActivity.this.finish();
@@ -131,15 +131,27 @@ public class EditActivity extends Activity {
 			myDisciple.setEmail(email);
 			myDisciple.setPhone(phone);
 			myDisciple.setAge(age);
+			myDisciple.setID(selectedID);
 
 			// ADD DATA TO OUR LOCAL SQL DB
-			//db.addDisciple(myDisciple);
+			int update = db.updateDisciple(myDisciple);
+			Log.i(TAG, Integer.toString(update));
 			
-			// Notify the user what they just did
-			Toast.makeText(
-					this,
-					"Woohoo! Disciple successfully saved! ", Toast.LENGTH_SHORT)
-					.show();
+			if (update > 0) { // SUCCESSFUL UPDATE
+				// Notify the user what they just did
+				Toast.makeText(
+						this,
+						"Woohoo! Disciple successfully saved! ", Toast.LENGTH_SHORT)
+						.show();
+			}
+			else {
+				// Notify the user what they just did
+				Toast.makeText(
+						this,
+						"There seems to be a problem here mate. Disciple failed to save. ", Toast.LENGTH_SHORT)
+						.show();
+
+			}
 
 			// FINISH
 			((EditActivity) this).finish();
