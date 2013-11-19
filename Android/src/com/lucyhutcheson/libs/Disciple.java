@@ -46,6 +46,16 @@ public class Disciple {
 		this._age = age;
 	}
 
+	// CONSTRUCTOR
+	public Disciple(String first, String last, String email, String phone, int age, int id) {
+		this._first = first;
+		this._last = last;
+		this._email = email;
+		this._phone = phone;
+		this._age = age;
+		this._id = id;
+	}
+
 
 	// GET ID
 	public int getID() {

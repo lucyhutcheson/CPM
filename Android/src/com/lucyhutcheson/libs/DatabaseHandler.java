@@ -59,7 +59,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	Log.i(TAG, "getAllDisciples STARTED");
 		List<Disciple> discipleList = new ArrayList<Disciple>();
 		
-		String selectQuery = "SELECT * FROM " + TABLE_NAME;
+		// LET'S ORDER OUR LIST BY FIRST NAME BY DEFAULT
+		String selectQuery = "SELECT * FROM " + TABLE_NAME + " ORDER BY first";
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
@@ -101,13 +102,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getReadableDatabase();
 		discipleResult = null;
 		discipleResult = new ArrayList<Disciple>();
-		Cursor cursor = db.query(TABLE_NAME, new String[] {KEY_FIRST, KEY_LAST, KEY_EMAIL, KEY_PHONE, KEY_AGE}, null, null, null, null, filter);
+		Cursor cursor = db.query(TABLE_NAME, new String[] {KEY_FIRST, KEY_LAST, KEY_EMAIL, KEY_PHONE, KEY_AGE, KEY_ID}, null, null, null, null, filter);
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
 		if (cursor.moveToFirst()) {
 			do {
-				Disciple disciple = new Disciple(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
+				Disciple disciple = new Disciple(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4),  cursor.getInt(5));
 				discipleResult.add(disciple);
 			} while (cursor.moveToNext());
 		}

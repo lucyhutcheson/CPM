@@ -64,9 +64,9 @@ public class MainActivity extends Activity {
 
 	static final String TAG = "MAINACTIVITY";
 	static final String[] _from = new String[] { "first", "last", "phone",
-			"age", "email" };
+			"age", "email"};
 	static final int[] _to = new int[] { R.id.firstHolder, R.id.lastHolder,
-			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder };
+			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +186,8 @@ public class MainActivity extends Activity {
 
 	// EDIT / DELETE CONTEXT MENU
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Choose Action");
 		MenuInflater inflater = getMenuInflater();
@@ -199,11 +200,11 @@ public class MainActivity extends Activity {
 				.getMenuInfo();
 		switch (item.getItemId()) {
 
-		// EDIT DISCIPLE CHOICE
+		// EDIT DISCIPLE CHOICE BASED ON ID FOUND BY ROW
 		case R.id.edit:
 			// INTENT TO START VIEW ACTIVITY
 			Intent intent = new Intent(MainActivity.this, EditActivity.class);
-			intent.putExtra("EXTRA_SESSION_ID", list.get((int) info.id).getID());
+			intent.putExtra("EXTRA_SESSION_ID", Integer.parseInt(discipleArrayList.get((int) info.id).get("id")));
 			MainActivity.this.startActivity(intent);
 
 			// editNote(info.id);
