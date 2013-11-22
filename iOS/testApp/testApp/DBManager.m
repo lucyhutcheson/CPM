@@ -86,6 +86,8 @@ static sqlite3_stmt *statement = nil;
 
 
 
+
+
 /*- (NSMutableArray*) findByMovie:(NSString*)movieTitle findByFilter:(NSString*)movieFilter showAll:(BOOL)showAll
 {
     const char *dbpath = [databasePath UTF8String];
@@ -215,6 +217,7 @@ static sqlite3_stmt *statement = nil;
     }
     return NO;
 }
+
 
 
 @end

@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
+import android.content.Context;
 import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -30,13 +31,13 @@ public class OnlineDataHandler    {
 	ParseQuery<ParseObject> query;
 	List<ParseObject> onlineList;
 	DatabaseHandler localDB;
-
+	ArrayList<HashMap<String, String>> queryResults;
+	Context _context;
 	
 	
-	public ArrayList<HashMap<String, String>> getAllOnline(boolean saveToLocal) {
+	public ArrayList<HashMap<String, String>> getAllOnline() {
     	Log.i(TAG, "getAllONLINEDisciples STARTED");
 
-		ArrayList<HashMap<String, String>> queryResults = null;
 		onlineList = new ArrayList<ParseObject>();
 		
 		query = ParseQuery.getQuery("Disciple");
@@ -45,61 +46,53 @@ public class OnlineDataHandler    {
 			@Override
 			public void done(List<ParseObject> objects, ParseException e) {
 				Log.i(TAG, objects.toString());
+
+				long timeStamp = (int) (System.currentTimeMillis()/1000);
+				queryResults = new ArrayList<HashMap<String, String>>();
 				for (int i=0; i<objects.size(); i++) {
-					onlineList.add(objects.get(i);
+					String first = objects.get(i).get("first").toString();
+					String last = objects.get(i).get("last").toString();
+					String email = objects.get(i).get("email").toString();
+					String phone = objects.get(i).get("phone").toString();
+					String age = objects.get(i).get("age").toString();
+					int localId = Integer.parseInt(objects.get(i).get("localId").toString());
+					
+					// ADD TO HASHMAP
+					queryResults.add(createMap(localId, first,	last, age, email, phone, timeStamp));
 				}
 			}
 		});
 				
-		if (onlineList.size() > 0) {
-			
-			localDB.addAllDisciples(onlineList);
-			
-			/*queryResults = new ArrayList<HashMap<String, String>>();
-			MainActivity mainAct = new MainActivity();
-			
-			for (ParseObject item : onlineList) {
-				long timeStamp = (int) (System.currentTimeMillis()/1000);
-
-				queryResults.add(mainAct.createMap((Integer)item.get("localId"), item.get("first").toString(),
-						item.get("last").toString(), item.get("age").toString(),
-						item.get("email").toString(), item.get("phone").toString(), timeStamp));
-				
-				if (saveToLocal) {
-					addDisciplesToDB(item.get("first").toString(), item.get("last").toString(), item.get("email").toString(), item.get("phone").toString(), (Integer) item.get("age"));
-				}
-			}*/
-		} 
-
 		return queryResults;
 	}
 
-	// ADD OUR DISCIPLES TO LOCAL SQL DATABASE FOR SYNCING
-	public void addDisciplesToDB(String first, String last, String email,
-		String phone, int age) {
-		Disciple myDisciple = new Disciple();
-		myDisciple.setFirst(first);
-		myDisciple.setLast(last);
-		myDisciple.setEmail(email);
-		myDisciple.setPhone(phone);
-		myDisciple.setAge(age);
-
-		// ALSO ADD THIS SETUP DATA TO OUR LOCAL SQL DB
-		//DatabaseHandler localDB = new DatabaseHandler();
-		//localDB.addDisciple(myDisciple);
+	// CREATE HASHMAP FUNCTION
+	public HashMap<String, String> createMap(int id, String first,
+			String last, String age, String email, String phone, long time) {
+		HashMap<String, String> discipleMap = new HashMap<String, String>();
+		discipleMap.put("first", first);
+		discipleMap.put("last", last);
+		discipleMap.put("age", age);
+		discipleMap.put("email", email);
+		discipleMap.put("phone", phone);
+		discipleMap.put("id", Integer.toString(id));
+		discipleMap.put("timestamp", Long.toString(time));
+		return discipleMap;
 	}
 
 
+
+
 	// ADDS ONE SINGLE DISCIPLE TO THE ONLINE DB
-	public void addDisciple(OnlineDisciple discipleObject) {
+	public void addDisciple(Disciple myDisciple) {
 				
 		ParseObject newDisciple = new ParseObject("Disciple");
-		newDisciple.put("localId", discipleObject.getID());
-		newDisciple.put("first", discipleObject.getFirst());
-		newDisciple.put("last", discipleObject.getLast());
-		newDisciple.put("email", discipleObject.getEmail());
-		newDisciple.put("phone", discipleObject.getPhone());
-		newDisciple.put("age", discipleObject.getAge());
+		newDisciple.put("localId", myDisciple.getID());
+		newDisciple.put("first", myDisciple.getFirst());
+		newDisciple.put("last", myDisciple.getLast());
+		newDisciple.put("email", myDisciple.getEmail());
+		newDisciple.put("phone", myDisciple.getPhone());
+		newDisciple.put("age", myDisciple.getAge());
 		newDisciple.saveInBackground();
 	 
 	}

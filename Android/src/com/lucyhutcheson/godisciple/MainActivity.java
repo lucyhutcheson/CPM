@@ -86,8 +86,9 @@ public class MainActivity extends Activity {
 		// INITIALIZE OUR LOCAL SQL DB AND ONLINE DB HANDLERS
 		db = new DatabaseHandler(this);
 		onlineDB = new OnlineDataHandler();
+		
 		// SETUP PARSE
-		Parse.initialize(this, "4Hlh6s58WR1CJ65lPMxZagcFWQEWjkaue2kybM5j", "6Rl8bsVpgP6G9vAN1vZXwTSq6IyIMLzKwUsRgVMZ");
+		Parse.initialize(this, "wV4fx6jyR8xSFl0UX0k2jXAelPk2cbh0yToz87oa", "VpsMRjeYjurtnxWJ6njpRV5s38FOVxEofeBFgYvV");
 		ParseAnalytics.trackAppOpened(getIntent());
 		
 		try {
@@ -134,15 +135,16 @@ public class MainActivity extends Activity {
 				R.layout.disciplelist_row, _from, _to);
 		listView.setAdapter(adapter);
 		listView.invalidateViews();
-
 	}
 	
 
+	@SuppressWarnings("static-access")
 	public void syncData () throws ParseException {
 		// IF WE HAVE DATA ONLINE BUT NO LOCAL DB, PULL THAT DATA DOWN
 		if (getOnlineCount() > 0 && db.getDiscipleCount() == 0) {
-			ArrayList<HashMap<String, String>> queryResults = onlineDB.getAllOnline(true);
-			reloadTable(null);
+			ArrayList<HashMap<String, String>> queryResults = new ArrayList<HashMap<String,String>>();
+			queryResults = onlineDB.getAllOnline();
+			reloadTable(queryResults);
 		}
 		// ELSE, IF WE HAVE LOCAL DATA BUT ONLINE IS EMPTY,
 		// UPLOAD OUR LOCAL DATA 
@@ -204,6 +206,7 @@ public class MainActivity extends Activity {
 	// CREATE HASHMAP FUNCTION
 	public HashMap<String, String> createMap(int id, String first,
 			String last, String age, String email, String phone, long time) {
+		
 		HashMap<String, String> discipleMap = new HashMap<String, String>();
 		discipleMap.put("first", first);
 		discipleMap.put("last", last);
