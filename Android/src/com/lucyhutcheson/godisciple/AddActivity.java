@@ -13,6 +13,7 @@ package com.lucyhutcheson.godisciple;
 
 import com.lucyhutcheson.libs.DatabaseHandler;
 import com.lucyhutcheson.libs.Disciple;
+import com.lucyhutcheson.libs.OnlineDataHandler;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,6 +29,7 @@ public class AddActivity extends Activity {
 	public static final String TAG = "ADDACTIVITY";
 	Context context = this;
 	DatabaseHandler db;
+	OnlineDataHandler onlineDB;
 	MainActivity main;
 	static EditText _firstField;
 	static EditText _lastField;
@@ -47,8 +49,9 @@ public class AddActivity extends Activity {
 		_phoneField = (EditText) findViewById(R.id.phoneTextField);
 		_ageField = (EditText) findViewById(R.id.ageTextField);
 
-		// Initialize our Database
+		// INITIAZLIZE THE LOCAL AND ONLINE DBS
 		db = new DatabaseHandler(this);
+		onlineDB = new OnlineDataHandler();
 
 	}
 
@@ -77,6 +80,7 @@ public class AddActivity extends Activity {
 			String phone = _phoneField.getText().toString();
 			int age = Integer.parseInt(_ageField.getText().toString());
 			
+			// SETUP LOCAL DISCIPLE OBJECT
 			Disciple myDisciple = new Disciple();
 			myDisciple.setFirst(first);
 			myDisciple.setLast(last);
@@ -86,6 +90,20 @@ public class AddActivity extends Activity {
 
 			// ADD DATA TO OUR LOCAL SQL DB
 			db.addDisciple(myDisciple);
+			
+			/*// SETUP ONLINE DISCIPLE OBJECT
+			int newLocalID = db.getDiscipleCount(); // GET OUR CURRENT LIST AND ADD 1
+			OnlineDisciple onlineDisciple = new OnlineDisciple();
+			onlineDisciple.setID(newLocalID);
+			onlineDisciple.setFirst(first);
+			onlineDisciple.setLast(last);
+			onlineDisciple.setEmail(email);
+			onlineDisciple.setPhone(phone);
+			onlineDisciple.setAge(age);
+			
+			// ADD DATA TO OUR ONLINE DB
+			onlineDB.addDisciple(onlineDisciple);*/
+
 			
 			// Notify the user what they just did
 			Toast.makeText(

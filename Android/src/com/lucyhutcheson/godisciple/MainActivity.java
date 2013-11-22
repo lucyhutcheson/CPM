@@ -34,8 +34,10 @@ import android.widget.Toast;
 
 import com.lucyhutcheson.libs.DatabaseHandler;
 import com.lucyhutcheson.libs.Disciple;
+import com.lucyhutcheson.libs.OnlineDataHandler;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -45,6 +47,7 @@ public class MainActivity extends Activity {
 	Context context = this;
 	ListView listView;
 	DatabaseHandler db;
+	OnlineDataHandler onlineDB;
 	ArrayList<String> _disciples = new ArrayList<String>();
 	ArrayList<HashMap<String, String>> discipleArrayList;
 	String firstNames[] = new String[] { "Simon", "Andrew", "James", "John",
@@ -61,48 +64,57 @@ public class MainActivity extends Activity {
 			"789-012-3456", "234-567-8901", "789-012-3456", "234-567-8901" };
 	int ageList[] = new int[] { 18, 21, 24, 19, 23, 31, 27, 16, 25, 32 };
 	List<Disciple> list = null;
-
+	List<HashMap<String, String>> onlineList;
+	int onlineCount; 
+	
+	
 	static final String TAG = "MAINACTIVITY";
 	static final String[] _from = new String[] { "first", "last", "phone",
-			"age", "email"};
+			"age", "email", "timestamp", "id"};
 	static final int[] _to = new int[] { R.id.firstHolder, R.id.lastHolder,
-			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder};
+			R.id.phoneHolder, R.id.ageHolder, R.id.emailHolder, R.id.timeHolder, R.id.idHolder};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Setup our content view
+		// SETUP OUR CONTENT VIEW
 		setContentView(R.layout.activity_main);
 		listView = (ListView) findViewById(R.id.listview);
 		registerForContextMenu(listView);
 
-		// Initialize our Database
+		// INITIALIZE OUR LOCAL SQL DB AND ONLINE DB HANDLERS
 		db = new DatabaseHandler(this);
-
-		// Parse
-		Parse.initialize(this, "wV4fx6jyR8xSFl0UX0k2jXAelPk2cbh0yToz87oa",
-				"VpsMRjeYjurtnxWJ6njpRV5s38FOVxEofeBFgYvV");
+		onlineDB = new OnlineDataHandler();
+		// SETUP PARSE
+		Parse.initialize(this, "4Hlh6s58WR1CJ65lPMxZagcFWQEWjkaue2kybM5j", "6Rl8bsVpgP6G9vAN1vZXwTSq6IyIMLzKwUsRgVMZ");
 		ParseAnalytics.trackAppOpened(getIntent());
-		// ParseQuery<ParseObject> query = ParseQuery.getQuery("Disciple");
-
-		// GET OUR DATA
-		// CHECK IF WE HAVE ANY DATA
-		int count = db.getDiscipleCount();
 		
-		// IF THERE IS NO DATA IN LOCAL SQL DB, ADD STARTER DATA INTO LOCAL DB
-		if (count < 1) {
-			setupData();
+		try {
+			syncData();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-	}
+	} // END OF ONCREATE
 
 	// REFRESH OUR TABLE ON START OF ACTIVITY
 	public void onStart() {
 		super.onStart();
-		// The rest of your onStart() code.
+		// CALL THE REFRESH TABLE FUNCTION
 		reloadTable(null);
-
+	}
+	
+	// SYNC OUR DATA WHEN WE LEAVE THIS ACTIVITY
+	public void onStop() {
+		super.onStop();
+		try {
+			syncData();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// REFRESH OUR TABLE
@@ -124,19 +136,74 @@ public class MainActivity extends Activity {
 		listView.invalidateViews();
 
 	}
+	
 
+	public void syncData () throws ParseException {
+		// IF WE HAVE DATA ONLINE BUT NO LOCAL DB, PULL THAT DATA DOWN
+		if (getOnlineCount() > 0 && db.getDiscipleCount() == 0) {
+			ArrayList<HashMap<String, String>> queryResults = onlineDB.getAllOnline(true);
+			reloadTable(null);
+		}
+		// ELSE, IF WE HAVE LOCAL DATA BUT ONLINE IS EMPTY,
+		// UPLOAD OUR LOCAL DATA 
+		else if (db.getDiscipleCount() > 0 && getOnlineCount() == 0){
+			// GET ALL OUR LOCAL DATA
+			List<Disciple> listOfAll = db.getAllDisciples();
+			
+			// CONVERT THEM TO PARSE OBJECTS AND ADD IT TO A LIST
+			List<ParseObject> parseList = new ArrayList<ParseObject>();
+			if (listOfAll != null) {
+				for (Disciple item : listOfAll) {
+					ParseObject pObject = new ParseObject("Disciple");
+					pObject.put("first", item.getFirst());
+					pObject.put("last", item.getLast());
+					pObject.put("email", item.getEmail());
+					pObject.put("phone", item.getPhone());
+					pObject.put("age", item.getAge());
+					pObject.put("localId", item.getID());
+					parseList.add(pObject);
+				}
+			}
+			
+			// UPLOAD THE LIST TO OUR ONLINE DB
+			ParseObject uploadObject = new ParseObject("Disciple");
+			uploadObject.saveAllInBackground(parseList);
+		}
+		// ELSE, IF WE HAVE NO DATA LOCALLLY AND ONLINE, INSTALL STARTER DATA
+		else if (db.getDiscipleCount() == 0 && getOnlineCount() == 0) {
+			setupData(true); // TRUE FOR BOTH LOCAL AND ONLINE DATA
+		}	
+	}
+	
 	// SETUP INITIAL DEFAULT DATA
-	private void setupData() {
+	private void setupData(boolean setupOnline) {
+		
+		// SETUP OUR LOCAL DATA
 		for (int i = 0; i < firstNames.length; i++) {
 			// USE LOCAL ARRAYS TO ADD DATA TO LOCAL SQL DB
 			addDisciplesToDB(firstNames[i], lastNames[i], emailList[i],
 					phoneList[i], ageList[i]);
 		}
+
+		// IF TRUE, ALSO SETUP THE ONLINE DATABASE
+		if (setupOnline) {
+			for (int i = 0; i < firstNames.length; i++) {
+				// USE LOCAL ARRAYS TO ADD DATA TO ONLINE DB
+				ParseObject newDisciple = new ParseObject("Disciple");
+				newDisciple.put("localId", i+1);
+				newDisciple.put("first", firstNames[i]);
+				newDisciple.put("last", lastNames[i]);
+				newDisciple.put("email", emailList[i]);
+				newDisciple.put("phone", phoneList[i]);
+				newDisciple.put("age", ageList[i]);
+				newDisciple.saveInBackground();
+			}
+		}
 	}
 
 	// CREATE HASHMAP FUNCTION
-	private HashMap<String, String> createMap(int id, String first,
-			String last, String age, String email, String phone) {
+	public HashMap<String, String> createMap(int id, String first,
+			String last, String age, String email, String phone, long time) {
 		HashMap<String, String> discipleMap = new HashMap<String, String>();
 		discipleMap.put("first", first);
 		discipleMap.put("last", last);
@@ -144,6 +211,7 @@ public class MainActivity extends Activity {
 		discipleMap.put("email", email);
 		discipleMap.put("phone", phone);
 		discipleMap.put("id", Integer.toString(id));
+		discipleMap.put("timestamp", Long.toString(time));
 		return discipleMap;
 	}
 
@@ -175,7 +243,7 @@ public class MainActivity extends Activity {
 			for (Disciple item : list) {
 				queryResults.add(createMap(item.getID(), item.getFirst(),
 						item.getLast(), (Integer.toString(item.getAge())),
-						item.getEmail(), item.getPhone()));
+						item.getEmail(), item.getPhone(), item.getTimestamp()));
 			}
 		} else {
 			Toast.makeText(MainActivity.this, "No disciples found.",
@@ -237,7 +305,10 @@ public class MainActivity extends Activity {
 
 		// DELETE FUNCTION
 		if (db.deleteDisciple(disciple)) {
-
+			
+			// DELETE FROM ONLINE DB
+			onlineDB.deleteDisciple(disciple);
+			
 			// REFRESH TABLE LISTVIEW
 			reloadTable(null);
 
@@ -310,7 +381,7 @@ public class MainActivity extends Activity {
 			for (Disciple item : list) {
 				queryResults.add(createMap(item.getID(), item.getFirst(),
 						item.getLast(), (Integer.toString(item.getAge())),
-						item.getEmail(), item.getPhone()));
+						item.getEmail(), item.getPhone(), item.getTimestamp()));
 			}
 		} else {
 			Toast.makeText(MainActivity.this, "No disciples found.",
@@ -319,5 +390,17 @@ public class MainActivity extends Activity {
 		reloadTable(queryResults);
 
 	}
+
+	public int getOnlineCount() throws ParseException {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Disciple");
+
+		// CHECK IF THERE'S DATA IN PARSE
+		query = ParseQuery.getQuery("Disciple");
+			onlineCount = query.count();
+			Log.i(TAG, Integer.toString(onlineCount));
+		
+		return onlineCount;
+	}
+
 
 }

@@ -14,6 +14,8 @@ import java.util.List;
 
 import com.lucyhutcheson.libs.DatabaseHandler;
 import com.lucyhutcheson.libs.Disciple;
+import com.lucyhutcheson.libs.OnlineDataHandler;
+import com.lucyhutcheson.libs.OnlineDisciple;
 
 import android.app.Activity;
 import android.content.Context;
@@ -133,9 +135,23 @@ public class EditActivity extends Activity {
 			myDisciple.setAge(age);
 			myDisciple.setID(selectedID);
 
-			// ADD DATA TO OUR LOCAL SQL DB
+			// UPDATE DATA ON OUR LOCAL SQL DB
 			int update = db.updateDisciple(myDisciple);
 			Log.i(TAG, Integer.toString(update));
+			
+			// UPDATE OUR ONLINE DB
+			OnlineDisciple onlineDisciple = new OnlineDisciple();
+			onlineDisciple.setFirst(first);
+			onlineDisciple.setLast(last);
+			onlineDisciple.setEmail(email);
+			onlineDisciple.setPhone(phone);
+			onlineDisciple.setAge(age);
+			onlineDisciple.setID(selectedID);
+
+			// ADD DATA TO OUR LOCAL SQL DB
+			OnlineDataHandler onlineDB = new OnlineDataHandler();
+			onlineDB.updateDisciple(onlineDisciple);
+
 			
 			if (update > 0) { // SUCCESSFUL UPDATE
 				// Notify the user what they just did

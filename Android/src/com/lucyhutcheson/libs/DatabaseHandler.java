@@ -13,6 +13,8 @@ package com.lucyhutcheson.libs;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.parse.ParseObject;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -72,6 +74,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				discipleObject.setPhone(cursor.getString(3));
 				discipleObject.setEmail(cursor.getString(4));
 				discipleObject.setAge(cursor.getInt(5));
+				discipleObject.setTimestamp(cursor.getLong(6));
 				
 				discipleList.add(discipleObject);
 			}
@@ -82,6 +85,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	// ADDS ONE SINGLE DISCIPLE TO THE LOCAL SQL DB
 	public void addDisciple(Disciple discipleObject) {
+		
+		long timeStamp = (int) (System.currentTimeMillis()/1000);
+		
 	    SQLiteDatabase db = this.getWritableDatabase();
 	 
 	    ContentValues values = new ContentValues();
@@ -90,6 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    values.put(KEY_EMAIL, discipleObject.getEmail()); 
 	    values.put(KEY_PHONE, discipleObject.getPhone()); 
 	    values.put(KEY_AGE, discipleObject.getAge()); 
+	    values.put(KEY_TIMESTAMP, timeStamp);
 	 
 	    // INSERT QUERY
 	    db.insert(TABLE_NAME, null, values);
@@ -102,13 +109,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getReadableDatabase();
 		discipleResult = null;
 		discipleResult = new ArrayList<Disciple>();
-		Cursor cursor = db.query(TABLE_NAME, new String[] {KEY_FIRST, KEY_LAST, KEY_EMAIL, KEY_PHONE, KEY_AGE, KEY_ID}, null, null, null, null, filter);
+		Cursor cursor = db.query(TABLE_NAME, new String[] {KEY_ID, KEY_FIRST, KEY_LAST, KEY_EMAIL, KEY_PHONE, KEY_AGE, KEY_TIMESTAMP}, null, null, null, null, filter);
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
 		if (cursor.moveToFirst()) {
 			do {
-				Disciple disciple = new Disciple(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4),  cursor.getInt(5));
+				Disciple disciple = new Disciple(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getInt(5), cursor.getInt(6));
 				discipleResult.add(disciple);
 			} while (cursor.moveToNext());
 		}
@@ -155,6 +162,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	// UPDATES DISCIPLE ENTRY BASED ON PASSED IN ID AND OBJECT DATA
 	public int updateDisciple(Disciple disciple) {
+		// GET CURRENT TIME
+		long timeStamp = (int) (System.currentTimeMillis()/1000);
+
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues newData = new ContentValues();
@@ -163,6 +173,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		newData.put(KEY_EMAIL, disciple.getEmail());
 		newData.put(KEY_PHONE, disciple.getPhone());
 		newData.put(KEY_AGE, disciple.getAge());
+		newData.put(KEY_TIMESTAMP, timeStamp);
 		
 		Log.i(TAG, newData.toString());
 		Log.i(TAG, String.valueOf(disciple.getID()));
@@ -170,5 +181,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return db.update(TABLE_NAME, newData, KEY_ID + " = ?", new String[] { String.valueOf(disciple.getID()) });
 		
 	}
+	
+	// ADDS ONE SINGLE DISCIPLE TO THE LOCAL SQL DB
+	public void addAllDisciples(List<ParseObject> myListToAdd) {
+		
+		long timeStamp = (int) (System.currentTimeMillis()/1000);
+		
+	    SQLiteDatabase db = this.getWritableDatabase();
+	 
+	    if (myListToAdd.size() > 0) {
+	    	for (ParseObject myObject : myListToAdd) {
+	    	    ContentValues values = new ContentValues();
+	    	    values.put(KEY_FIRST, myObject.getString("first")); 
+	    	    values.put(KEY_LAST, myObject.getString("last")); 
+	    	    values.put(KEY_EMAIL, myObject.getString("email")); 
+	    	    values.put(KEY_PHONE, myObject.getString("phone")); 
+	    	    values.put(KEY_AGE, myObject.getInt("age")); 
+	    	    values.put(KEY_TIMESTAMP, timeStamp);
+	    	 
+	    	    // INSERT QUERY
+	    	    db.insert(TABLE_NAME, null, values);
+	    	}
+	    }
+	    db.close(); 
+	}
+
 	
 }

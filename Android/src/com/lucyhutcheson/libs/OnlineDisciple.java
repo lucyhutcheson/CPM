@@ -5,14 +5,14 @@
  * 
  * @author		Lucy Hutcheson
  * 
- * date			Nov 16, 2013
+ * date			Nov 20, 2013
  * 
  */
 package com.lucyhutcheson.libs;
 
-public class Disciple {
 
-	// VARIABLES
+public class OnlineDisciple  {
+	
 	int _id;
 	String _first;
 	String _last;
@@ -21,13 +21,14 @@ public class Disciple {
 	int _age;
 	long _timestamp;
 
+	
 	// EMPTY CONSTRUCTOR
-	public Disciple() {
-
+	public OnlineDisciple() {
+		
 	}
-
+	
 	// CONSTRUCTOR
-	public Disciple(int id, String first, String last, String email, String phone, int age, long timestamp) {
+	public OnlineDisciple(int id, String first, String last, String email, String phone, int age, long timestamp) {
 		this._id = id;
 		this._first = first;
 		this._last = last;
@@ -38,7 +39,7 @@ public class Disciple {
 	}
 	
 	// CONSTRUCTOR
-	public Disciple(String first, String last, String email, String phone, int age) {
+	public OnlineDisciple(String first, String last, String email, String phone, int age) {
 		this._first = first;
 		this._last = last;
 		this._email = email;
@@ -47,7 +48,7 @@ public class Disciple {
 	}
 
 	// CONSTRUCTOR
-	public Disciple(String first, String last, String email, String phone, int age, int id) {
+	public OnlineDisciple(String first, String last, String email, String phone, int age, int id) {
 		this._first = first;
 		this._last = last;
 		this._email = email;
@@ -119,6 +120,4 @@ public class Disciple {
 	public void setTimestamp(long timestamp) {
 		this._timestamp = timestamp;
 	}
-	
 }
-
