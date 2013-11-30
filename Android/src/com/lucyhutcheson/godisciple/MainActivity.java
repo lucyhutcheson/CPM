@@ -141,14 +141,14 @@ public class MainActivity extends Activity {
 	@SuppressWarnings("static-access")
 	public void syncData () throws ParseException {
 		// IF WE HAVE DATA ONLINE BUT NO LOCAL DB, PULL THAT DATA DOWN
-		if (getOnlineCount() > 0 && db.getDiscipleCount() == 0) {
+		/*if (getOnlineCount() > 0 && db.getDiscipleCount() == 0) {
 			ArrayList<HashMap<String, String>> queryResults = new ArrayList<HashMap<String,String>>();
 			queryResults = onlineDB.getAllOnline();
 			reloadTable(queryResults);
 		}
 		// ELSE, IF WE HAVE LOCAL DATA BUT ONLINE IS EMPTY,
 		// UPLOAD OUR LOCAL DATA 
-		else if (db.getDiscipleCount() > 0 && getOnlineCount() == 0){
+		else*/ if (db.getDiscipleCount() > 0 && getOnlineCount() == 0){
 			// GET ALL OUR LOCAL DATA
 			List<Disciple> listOfAll = db.getAllDisciples();
 			
